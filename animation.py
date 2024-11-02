@@ -1,15 +1,16 @@
 import tkinter as tk
+from PIL import Image, ImageTk
 import utils
 import random
 
 
 class Animation:
-    def __init__(self, root, taskbar_height, characterName="momo", characterType="gif", zoom_factor=1):
+    def __init__(self, root, taskbar_height, characterName="momo", characterType="gif", new_size=(0, 0)):
         self.root = root
         self.taskbar_height = taskbar_height
         self.characterName = characterName
         self.characterType = characterType
-        self.zoom_factor = zoom_factor
+        self.new_size = new_size
 
         self.img_width = 0
         self.img_height = 0
@@ -85,18 +86,17 @@ class Animation:
         for file, count in zip(self.action_name, self.frame_counts):
             self.images[file] = []
 
-            for i in range(count):
-                image = tk.PhotoImage(file=f'./Character/{self.characterName}/{file}.gif', format=f'gif -index {i}')
-                self.images[file].append(image)
+            img_path = f'./Character/{self.characterName}/{file}.gif'
+            image = utils.resize_image_gif(img_path, self.new_size)
 
-                if self.img_width < image.width():
-                    self.img_width = image.width()
+            for i in range(len(image)):
+                # print(type(image[i]))
+                self.images[file].append(image[i])
+                if self.img_width < image[i].width():
+                    self.img_width = image[i].width()
 
-                if self.img_height < image.height():
-                    self.img_height = image.height()
-
-        if self.zoom_factor != 1:
-            self.images = utils.zoom_images(self.images, self.zoom_factor)
+                if self.img_height < image[i].height():
+                    self.img_height = image[i].height()
 
     def load_animation_png(self):
 
@@ -104,11 +104,12 @@ class Animation:
             self.images[action_type] = []
             img_path = ''
 
-            for i in range(0, count):
+            for i in range(count):
                 img_path = f'./Character/{self.characterName}/{action_type}/{i}.png'
                 try:
                     # print(img_path)
-                    photo = tk.PhotoImage(file=img_path)
+                    photo = utils.resize_image_png(img_path, self.new_size)
+                    # print(type(photo))
                     # 添加到 images 字典中
                     self.images[action_type].append(photo)
 
@@ -120,9 +121,6 @@ class Animation:
 
                 except Exception as e:
                     print(f"加载异常：{e}")
-
-        if self.zoom_factor != 1:
-            self.images = utils.zoom_images(self.images, self.zoom_factor)
 
     def change_status(self):
         self.status_num = random.choice([1, 2, 3, 4])  # 随机选择一个新的状态

@@ -7,7 +7,8 @@ class GUI:
     def __init__(self):
         self.root = tk.Tk()
 
-        self.action = Animation(self.root, taskbar_height=0, characterName="yoyo", characterType="png", zoom_factor=2)
+        self.action = Animation(self.root, taskbar_height=0, characterName="yoyo", characterType="png", new_size=(500, 500))
+        # self.action = Animation(self.root, taskbar_height=0, characterName="yoyo", characterType="gif")
         # self.action = Animation(self.root, taskbar_height=0)
         # self.action = Animation(self.root, taskbar_height=0, characterName="kuku", characterType="png")
 

@@ -1,7 +1,7 @@
 import os
 
 import pyautogui as pt
-from PIL import Image
+from PIL import Image, ImageTk
 
 
 def get_screen_size():
@@ -34,18 +34,38 @@ def get_png_frame_count(pngDir_path):
     return img_frame_count
 
 
-def zoom_images(photoImage_dir, zoom_factor):
-    zoomed_images = []
-    temp_dir = {}
-    for action_type, images in photoImage_dir.items():
-        zoomed_images = []
-        for image in images:
-            zoomed_image = image.zoom(zoom_factor, zoom_factor)
-            zoomed_images.append(zoomed_image)
-        temp_dir[action_type] = zoomed_images
+def resize_image_png(image_path, new_size):
+    with Image.open(image_path) as im:
+        if new_size != (0, 0):
+            im_resized = im.resize(new_size, resample=Image.BICUBIC)
+            # im_resized = im.resize(new_size, resample=Image.BILINEAR)
+            # im_resized = im.resize(new_size, resample=Image.LANCZOS)
 
-    return temp_dir
+        else:
+            im_resized = im
 
+        return ImageTk.PhotoImage(im_resized)
+
+
+def resize_image_gif(image_path, new_size):
+    im = Image.open(image_path)
+    num_frames = im.n_frames
+    frames_tk = []
+
+    for i in range(num_frames):
+        im.seek(i)
+
+        if new_size != (0, 0):
+            # 缩放当前帧
+            resized_frame = im.resize(new_size, resample=Image.BICUBIC)
+        else:
+            # 图像不进行放缩操作
+            resized_frame = im
+
+        photo_tk = ImageTk.PhotoImage(resized_frame)
+        frames_tk.append(photo_tk)
+
+    return frames_tk
 
 
 if __name__ == "__main__":
